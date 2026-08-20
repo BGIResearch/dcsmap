@@ -24,14 +24,14 @@ std::string jobDir(const Config& c, const std::string& name) {
 
 }  // namespace
 
-// T1: BWA-MEM2 map + extract
-std::string buildBwaMem2Extract(const Config& c, std::vector<std::string>& outputs) {
-    const std::string jd = jobDir(c, "bwa_mem2_extract");
+// T1: linear reference align (BWA-MEM2) + extract
+std::string buildLinearAlignExtract(const Config& c, std::vector<std::string>& outputs) {
+    const std::string jd = jobDir(c, "linear_align_extract");
     outputs = {
-        joinPath(jd, c.sample_name + ".bwa-mem2.extract_1.fastq.gz"),
-        joinPath(jd, c.sample_name + ".bwa-mem2.extract_2.fastq.gz"),
-        joinPath(jd, c.sample_name + ".bwa-mem2.not-extract.bam"),
-        joinPath(jd, c.sample_name + ".bwa-mem2.not-extract.bam.bai"),
+        joinPath(jd, c.sample_name + ".linear.extract_1.fastq.gz"),
+        joinPath(jd, c.sample_name + ".linear.extract_2.fastq.gz"),
+        joinPath(jd, c.sample_name + ".linear.not-extract.bam"),
+        joinPath(jd, c.sample_name + ".linear.not-extract.bam.bai"),
     };
     std::string s = R"BASH(set -euo pipefail
 export PATH="{{TOOLS_ROOT}}/libexec:$PATH"
@@ -39,16 +39,16 @@ export PATH="{{TOOLS_ROOT}}/libexec:$PATH"
 in_ref="{{REF_FASTA}}"
 sample="{{SAMPLE}}"
 printf -v read_group '@RG\tID:%s\tLB:%s\tSM:%s\tPL:{{PLATFORM}}' "$sample" "$sample" "$sample"
-extract_prefix="${sample}.bwa-mem2.extract"
-out_bam="${sample}.bwa-mem2.not-extract.bam"
+extract_prefix="${sample}.linear.extract"
+out_bam="${sample}.linear.not-extract.bam"
 
-echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') Start bwa-mem2 mapping and extract ..."
-/usr/bin/time -f "[bwa-mem2] real %e\tuser %U\tsys %S\tcpu_percentage %P\tmaxrss %M" \
+echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') Start linear align (bwa-mem2) mapping and extract ..."
+/usr/bin/time -f "[linear-align/bwa-mem2] real %e\tuser %U\tsys %S\tcpu_percentage %P\tmaxrss %M" \
     bwa-mem2 mem -S -r 3 -y 0 -Y -t {{THREADS}} -R "$read_group" "$in_ref" "{{FQ1}}" "{{FQ2}}" | \
     "${AWK}" '/^@/ {print;next} {print $0"\tMX:Z:BWA-MEM2"}' | \
     extract-bam -b 4000000 -t 12 -p "$extract_prefix" -M "{{EXTRACT_MODEL}}" | \
     samtools sort -l 1 -OBAM --threads {{SAMTOOLS_SORT_THREADS}} -m1g -o "$out_bam"##idx##"$out_bam".bai --write-index
-echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') End bwa-mem2 mapping and extract."
+echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') End linear align (bwa-mem2) mapping and extract."
 )BASH";
     replaceAll(s, "{{TOOLS_ROOT}}", c.tools_root);
     replaceAll(s, "{{REF_FASTA}}", c.ref_fasta);

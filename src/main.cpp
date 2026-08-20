@@ -59,10 +59,11 @@ std::string absolute(const std::string& p) {
 }
 
 // Make a path absolute without resolving symlinks. Needed for --ref-fasta:
-// bwa-mem2 looks up its index (.0123/.bwt.2bit.64/...) next to the ref path,
-// and the index may live in a directory reached through a symlink. realpath()
-// would collapse that symlink and break index lookup. We only normalize "."
-// and ".." lexically and prepend cwd for relative paths.
+// the linear aligner (bwa-mem2) looks up its index (.0123/.bwt.2bit.64/...)
+// next to the ref path, and the index may live in a directory reached
+// through a symlink. realpath() would collapse that symlink and break index
+// lookup. We only normalize "." and ".." lexically and prepend cwd for
+// relative paths.
 std::string absoluteNoSymlink(const std::string& p) {
     std::string base = p;
     if (p.empty() || p[0] != '/') {
@@ -136,7 +137,7 @@ bool cleanWorkDir(const std::string& work_root) {
         "command.sh", "command.sh.log.o", "command.sh.log.e", "command.sh.rc"
     };
     const std::vector<std::string> task_names = {
-        "bwa_mem2_extract", "vg_haplotype", "vg_giraffe", "merge_bams", "realign"
+        "linear_align_extract", "vg_haplotype", "vg_giraffe", "merge_bams", "realign"
     };
     std::error_code ec;
 
@@ -252,7 +253,7 @@ void usage() {
     printOpt("  --fq1 <file>",                {"input read1 fastq path"});
     printOpt("  --fq2 <file>",                {"input read2 fastq path"});
     printOpt("  --out-bam <file>",            {"output bam path (work dir defaults to its dirname)"});
-    printOpt("  --ref-fasta <file>",          {"reference fasta path (with .fai + .dict)"});
+    printOpt("  --ref-fasta <file>",          {"reference fasta path (with .fai + .dict + aligner index)"});
     printOpt("  --gbz <file>",                {"vg gbz graph path"});
     printOpt("  --hapl <file>",               {"vg hapl index path"});
     printOpt("  --graph-ref-contigs <file>",  {"vg ref-paths file"});
@@ -270,9 +271,9 @@ void usage() {
     printOpt("  --java-home <dir>",           {"JAVA home (must be Java 8)",
                                               "default: JAVA_HOME env"});
     printOpt("  --work-dir <dir>",            {"work dir (default: out-bam-dir/work.XXXXXX)"});
-    printOpt("  --parallel <bool>",             {"run bwa_mem2_extract and vg_haplotype in parallel (default: true)",
-                                                    "set to false to run vg_haplotype first, then bwa_mem2_extract"});
-    printOpt("  --clean <bool>",             {"clean work dir on success, keeping command.sh/logs/rc (default: true)"});
+    printOpt("  --parallel <bool>",           {"run linear_align_extract and vg_haplotype in parallel (default: true)",
+                                              "set to false to run vg_haplotype first, then linear_align_extract"});
+    printOpt("  --clean <bool>",              {"clean work dir on success, keeping command.sh/logs/rc (default: true)"});
 }
 
 bool parseBool(const std::string& v, bool& out, std::string& err, const char* key) {
@@ -377,9 +378,9 @@ int orchestrate(Config& c, const Args& a) {
     SIMP_LOG_INFO("==== workflow start (mode=%s parallel=%s threads=%d) ====",
                   a.mode.c_str(), a.parallel ? "true" : "false", c.threads);
 
-    // ---- T1: bwa_mem2_extract ; T2: vg_haplotype ----
+    // ---- T1: linear_align_extract ; T2: vg_haplotype ----
     std::vector<std::string> t1_out, t2_out;
-    Task t1("bwa_mem2_extract", c.work_root, buildBwaMem2Extract(c, t1_out), t1_out);
+    Task t1("linear_align_extract", c.work_root, buildLinearAlignExtract(c, t1_out), t1_out);
     Task t2("vg_haplotype", c.work_root, buildVgHaplotype(c, t2_out), t2_out);
 
     if (a.parallel) {
@@ -391,13 +392,13 @@ int orchestrate(Config& c, const Args& a) {
         if (t2.result().exit_code != 0) return 1;
     } else {
         if (!runSync(t2)) return 1;  // vg_haplotype first
-        if (!runSync(t1)) return 1;  // then bwa_mem2_extract
+        if (!runSync(t1)) return 1;  // then linear_align_extract
     }
 
     // T1 outputs
     std::string extract_fq1 = t1_out[0];
     std::string extract_fq2 = t1_out[1];
-    std::string bwa_bam = t1_out[2];
+    std::string linear_bam = t1_out[2];
     // T2 outputs
     std::string hap_gbz = t2_out[0];
     std::string hap_dist = t2_out[1];
@@ -426,13 +427,13 @@ int orchestrate(Config& c, const Args& a) {
         // merge_bams (FINAL) -> out-bam
         std::vector<std::string> mg_out;
         Task mg("merge_bams", c.work_root,
-                buildMergeBams(c, bwa_bam, abra2_bam, final_bam, mg_out), mg_out);
+                buildMergeBams(c, linear_bam, abra2_bam, final_bam, mg_out), mg_out);
         if (!runSync(mg)) return 1;
     } else {
-        // dcsmap-m1: merge_bams (intermediate) on bwa + giraffe bam
+        // dcsmap-m1: merge_bams (intermediate) on linear + giraffe bam
         std::vector<std::string> mg_out;
         Task mg("merge_bams", c.work_root,
-                buildMergeBams(c, bwa_bam, giraffe_bam, "", mg_out), mg_out);
+                buildMergeBams(c, linear_bam, giraffe_bam, "", mg_out), mg_out);
         if (!runSync(mg)) return 1;
         std::string merged_bam = mg_out[0];
         std::string merged_bai = mg_out[1];

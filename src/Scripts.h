@@ -41,8 +41,10 @@ struct Config {
 // Each builder returns the bash script body and fills `outputs` with the
 // absolute paths the task is expected to produce (used for verification).
 
-// T1: BWA-MEM2 map + extract. Produces extract fastq pair + not-extract bam/bai.
-std::string buildBwaMem2Extract(const Config& c, std::vector<std::string>& outputs);
+// T1: linear reference align (BWA-MEM2) + extract.
+// Produces extract fastq pair + not-extract bam/bai. Generic naming ("linear")
+// so the task can later host other linear aligners (minimap2, minibwa, ...).
+std::string buildLinearAlignExtract(const Config& c, std::vector<std::string>& outputs);
 
 // T2: VG haplotype sampling (kmc + vg haplotypes + vg index + vg minimizer).
 std::string buildVgHaplotype(const Config& c, std::vector<std::string>& outputs);
