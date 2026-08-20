@@ -1,0 +1,7 @@
+/nextflow/test
+/nextflow/results
+/nextflow/.nextflow
+/build
+/.vscode
+/.cursor
+/tools
