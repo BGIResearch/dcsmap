@@ -1,0 +1,13 @@
+Version	Type	BaseReference	URL	Bytes
+v2	Default	GRCh38	https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/freeze/release2/minigraph-cactus/v2.0/hprc-v2.0-mc-grch38/hprc-v2.0-mc-grch38.gbz	5419804360
+v2	Filtered	GRCh38	https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/freeze/release2/minigraph-cactus/v2.0/hprc-v2.0-mc-grch38/hprc-v2.0-mc-grch38.d46.gbz	12106047144
+v2-eval(held out: HG002,HG005,NA19240)	Default	GRCh38	https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/freeze/release2/minigraph-cactus/v2.0/benchmark-graphs/hprc-v2.0-mc-grch38-eval/hprc-v2.0-mc-grch38-eval.gbz	5386150200
+v2-eval(held out: HG002,HG005,NA19240)	Filtered	GRCh38	https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/freeze/release2/minigraph-cactus/v2.0/benchmark-graphs/hprc-v2.0-mc-grch38-eval/hprc-v2.0-mc-grch38-eval.d46.gbz	12051143096
+v2	Default	CHM13V2.0	https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/freeze/release2/minigraph-cactus/v2.0/hprc-v2.0-mc-chm13/hprc-v2.0-mc-chm13.gbz	5748718968
+v2	Filtered	CHM13V2.0	https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/freeze/release2/minigraph-cactus/v2.0/hprc-v2.0-mc-chm13/hprc-v2.0-mc-chm13.d46.gbz	12723460864
+v2-eval(held out: HG002,HG005,NA19240)	Default	CHM13V1.1	https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/freeze/release2/minigraph-cactus/v2.0/benchmark-graphs/hprc-v2.0-mc-chm13-eval/hprc-v2.0-mc-chm13-eval.gbz	5707542560
+v2-eval(held out: HG002,HG005,NA19240)	Filtered	CHM13V1.1	https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/freeze/release2/minigraph-cactus/v2.0/benchmark-graphs/hprc-v2.0-mc-chm13-eval/hprc-v2.0-mc-chm13-eval.d46.gbz	12532626144
+v1.1	Default	GRCh38	https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/freeze/freeze1/minigraph-cactus/hprc-v1.1-mc-grch38/hprc-v1.1-mc-grch38.gbz	3289083600
+v1.1	Filtered	GRCh38	https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/freeze/freeze1/minigraph-cactus/hprc-v1.1-mc-grch38/hprc-v1.1-mc-grch38.d9.gbz	4419285240
+v1.1	Default	CHM13V1.1	https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/freeze/freeze1/minigraph-cactus/hprc-v1.1-mc-chm13/hprc-v1.1-mc-chm13.gbz	3632228024
+v1.1	Filtered	CHM13V1.1	https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/freeze/freeze1/minigraph-cactus/hprc-v1.1-mc-chm13/hprc-v1.1-mc-chm13.d9.gbz	4693921456
