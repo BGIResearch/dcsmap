@@ -18,19 +18,41 @@ to any Linux x86_64 machine.
 
 ### Example
 
+```bash
+dcsmap \
+    --fq1  sample.R1.fastq.gz \
+    --fq2  sample.R2.fastq.gz \
+    --out-bam  /out/sample.bam \
+    --ref-fasta  /data/hprc-v2.0-mc-grch38.ref.fasta \
+    --gbz  /data/hprc-v2.0-mc-grch38.gbz \
+    --hapl  /data/hprc-v2.0-mc-grch38.hapl \
+    --graph-ref-contigs  /data/hprc-v2.0-mc-grch38.ref.pathnames \
+    --extract-model  /data/extract.model \
+    --sample-name HG002 \
+    --threads 32
+```
+
 `dcsmap` relies on the DCSTools environment: it invokes `vg`, `samtools`,
-`bwa-mem2`, `abra2.jar`, etc. from `$DCSTOOLS_HOME/libexec` and the bundled jars.
-Set up the environment before running:
+`bwa-mem2`, `abra2.jar`, etc. from a tools root directory (containing `libexec/`
+and `jar/` subdirectories) and requires Java 8 for ABRA2.
+
+- `--tools-root`: defaults to the parent of the `dcsmap` executable's directory
+  (e.g. if `dcsmap` is at `<DCSTOOLS_HOME>/libexec/dcsmap`, the default is
+  `<DCSTOOLS_HOME>`). If `dcsmap` is placed elsewhere, set `DCSTOOLS_HOME` env
+  var or pass `--tools-root` explicitly. `--tools-root` takes precedence over
+  `DCSTOOLS_HOME`.
+- `--java-home`: defaults to the `JAVA_HOME` env var. Must point to a Java 8
+  installation (required by ABRA2). Pass `--java-home` explicitly to override on
+  a per-invocation basis.
 
 ```bash
-export DCSTOOLS_HOME=/path/to/dcstools      # required: tools root (libexec + jar)
-export JAVA_HOME=/path/to/jdk8              # required: Java 8 for ABRA2
+# Optional: override via env vars instead of CLI flags
+export DCSTOOLS_HOME=/path/to/dcstools
+export JAVA_HOME=/path/to/jdk8
 export PATH="${DCSTOOLS_HOME}/libexec:${PATH}"
 ```
 
-The graph inputs (`--gbz`, `--hapl`, `--graph-ref-contigs`) and the linear
-reference (`--ref-fasta`) are not arbitrary — they must be prepared together so
-that contig names and order match across the graph and the linear reference:
+**Graph and linear reference inputs**
 
 - `--gbz`: download an HPRC minigraph-cactus gbz graph (see [HPRC Graphs](#hprc-graphs)).
 - `--hapl`, `--graph-ref-contigs` (`<prefix>.ref.pathnames`), and
@@ -42,30 +64,6 @@ that contig names and order match across the graph and the linear reference:
 - `--extract-model`: the machine-learning model used by `extract-bam` to flag
   low-confidence linear alignments for graph realignment. Obtain it from the
   DCSTools distribution (`$DCSTOOLS_HOME/share/dcsmap/extract.model` or similar).
-
-Then run `dcsmap`. `--tools-root` and `--java-home` override the env vars above
-on a per-invocation basis (useful when running multiple `dcsmap` instances
-against different tool trees):
-
-```bash
-dcsmap \
-    --fq1  sample.R1.fastq.gz \
-    --fq2  sample.R2.fastq.gz \
-    --out-bam  /out/sample.bam \
-    --ref-fasta  /data/hprc-v2.0-mc-grch38.ref.fasta \
-    --gbz  /data/hprc-v2.0-mc-grch38.gbz \
-    --hapl  /data/hprc-v2.0-mc-grch38.hapl \
-    --graph-ref-contigs  /data/hprc-v2.0-mc-grch38.ref.pathnames \
-    --extract-model  /data/extract.model \
-    --tools-root  /path/to/dcstools \
-    --java-home  /path/to/jdk8 \
-    --sample-name HG002 \
-    --threads 32
-```
-
-If `dcsmap` is placed inside a DCSTools install (i.e. `<DCSTOOLS_HOME>/bin/dcsmap`),
-`--tools-root` defaults to the parent of the executable's directory and can be
-omitted; otherwise set `DCSTOOLS_HOME` or pass `--tools-root` explicitly.
 
 ## Usage
 
