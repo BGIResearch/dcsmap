@@ -1,6 +1,6 @@
 # dcsmap
 
-`dcsmap` 是 DCSTools 的一部分，是一个快速、高精度的泛基因组感知（pangenome-aware）reads 比对工具。它采用混合比对策略，结合线性参考比对与泛基因组图比对。与 vg 工具集相比，`dcsmap` 在使用相同的下游 DeepVariant 变异检测流程时，比对速度提升 2.5 倍，同时 SNP/Indel 错误减少 7–12%。它使用机器学习模型从线性比对结果中识别低置信度比对，再用 vg giraffe 对这些 reads 重新比对，在提升比对精度的同时避免了对所有 reads 进行图比对的高昂计算开销。`dcsmap` 集成了优化版的 vg 工具集和 ABRA2，以实现高效的 haplotype 采样、图比对和 indel 重比对。
+`dcsmap` 是 DCSTools 的一部分，是一个快速、高精度的泛基因组感知（pangenome-aware）reads 比对工具。它采用混合比对策略，结合线性参考比对与泛基因组图比对。与 vg 工具集相比，`dcsmap` 在使用相同的下游 DeepVariant 变异检测流程时，比对速度提升 2.5 倍（在 32 核 128GB 服务器上从 ~5.5 小时降至 ~2.17 小时），同时 SNP/Indel 错误减少 7–12%。它使用机器学习模型从线性比对结果中识别低置信度比对，再用 vg giraffe 对这些 reads 重新比对，在提升比对精度的同时避免了对所有 reads 进行图比对的高昂计算开销。`dcsmap` 集成了优化版的 vg 工具集和 ABRA2，以实现高效的 haplotype 采样、图比对和 indel 重比对。
 
 ## 编译
 
@@ -182,6 +182,24 @@ scripts/build_hapl_fasta.sh /data/hprc-v2.0-mc-chm13.gbz CHM13
 # （无需 ref_dict —— CHM13 仅含 chr1-22/X/Y/M，使用自然顺序）
 ```
 
+#### 构建 vg hapl 索引资源消耗
+
+基于 HPRC v2 GRCh38 Default 图（`hprc-v2.0-mc-grch38.gbz`，5.4 GB）实测。
+
+| 步骤 | 命令 | 墙钟时间 | CPU% | 峰值 RSS | 产出大小 |
+|------|------|---------|------|---------|---------|
+| fasta + pathnames | `vg paths` / `samtools faidx` / `dict` | ~2m 20s | — | ~3 GB | 3.0 GB |
+| snarls | `vg snarls` | 29m 51s | 7098% | 67.8 GB | 215 MB |
+| xg | `vg convert -x --drop-haplotypes` | 9m 58s | 222% | 36.8 GB | 8.4 GB |
+| ri | `vg gbwt -Z -r` | 3m 28s | 6085% | 46.4 GB | 9.5 GB |
+| dist | `vg index -j` | 1h 00m | 96% | **262 GB** | **105.5 GB** |
+| hapl | `vg haplotypes -H` | 1h 53m | 1078% | 63.9 GB | 19.9 GB |
+| **合计** | | **~3h 40m** | — | — | **~148 GB** |
+
+> **注：** `vg index -j`（dist）是瓶颈——单线程，~262 GB 峰值内存，~105 GB 产出（占总产出 71%）。
+
+建议配置：32+ 核，300 GB 内存，300 GB SSD（300 GB 内存下限由 `vg index -j` dist 的 ~262 GB RSS 决定）。
+
 ### 2. 构建 bwa-mem2 索引
 
 `dcsmap` 的线性比对器（bwa-mem2）在 `--ref-fasta` 路径旁查找其索引文件
@@ -193,6 +211,18 @@ bwa-mem2 index <prefix>.ref.fasta
 ```
 
 这会将索引文件写入 fasta 旁。`.fai` 和 `.dict` 已在步骤 1 中生成。
+
+#### bwa-mem2 索引资源消耗
+
+基于同一 GRCh38 参考 fasta（`hprc-v2.0-mc-grch38.ref.fasta`，3.0 GB，ref seq len 6,199,845,082）实测：
+
+| 步骤 | 墙钟时间 | CPU% | 峰值 RSS | 产出大小 |
+|------|---------|------|---------|---------|
+| `bwa-mem2 index` | 16m 51s | 99% | 69.3 GB | 16.9 GB |
+
+产出明细：`.bwt.2bit.64`（9.4 GB）、`.0123`（5.8 GB）、`.pac`（738 MB）、`.amb` / `.ann`（< 30 KB）。
+
+建议配置：2+ 核，128 GB 内存，50 GB SSD（`bwa-mem2 index` 的 ~70 GB 峰值 RSS 决定了内存需求）。
 
 ## 许可证
 

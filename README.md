@@ -2,7 +2,7 @@
 
 [中文文档](doc/README_zh.md)
 
-`dcsmap` is a fast and accurate pangenome-aware read aligner developed as part of DCSTools. It employs a hybrid alignment strategy that combines linear-reference alignment with pangenome graph alignment. Compared with the vg toolkit, `dcsmap` achieves a 2.5-fold improvement in alignment speed while reducing SNP/Indel errors by 7–12% when evaluated using the same downstream DeepVariant variant-calling pipeline. A machine-learning model is used to identify low-confidence alignments from the linear alignment results, which are then selectively realigned using vg giraffe, improving alignment accuracy while avoiding the computational cost of graph-based alignment for all reads. `dcsmap` incorporates optimized vg toolkit and ABRA2 for efficient haplotype sampling, graph alignment and indel realignment.
+`dcsmap` is a fast and accurate pangenome-aware read aligner developed as part of DCSTools. It employs a hybrid alignment strategy that combines linear-reference alignment with pangenome graph alignment. Compared with the vg toolkit, `dcsmap` achieves a 2.5-fold improvement in alignment speed(from ~5.5h to ~2.17h on a 32c128g server) while reducing SNP/Indel errors by 7–12% when evaluated using the same downstream DeepVariant variant-calling pipeline. A machine-learning model is used to identify low-confidence alignments from the linear alignment results, which are then selectively realigned using vg giraffe, improving alignment accuracy while avoiding the computational cost of graph-based alignment for all reads. `dcsmap` incorporates optimized vg toolkit and ABRA2 for efficient haplotype sampling, graph alignment and indel realignment.
 
 ## Build
 
@@ -204,6 +204,27 @@ scripts/build_hapl_fasta.sh /data/hprc-v2.0-mc-chm13.gbz CHM13
 # (no ref_dict needed — CHM13 has only chr1-22/X/Y/M, natural order is used)
 ```
 
+#### build vg hapl index resource consumption
+
+Measured on the HPRC v2 GRCh38 Default graph (`hprc-v2.0-mc-grch38.gbz`,
+5.4 GB). 
+
+| Step | Command | Wall time | CPU % | Peak RSS | Output size |
+|------|---------|-----------|-------|----------|-------------|
+| fasta + pathnames | `vg paths` / `samtools faidx` / `dict` | ~2m 20s | — | ~3 GB | 3.0 GB |
+| snarls | `vg snarls` | 29m 51s | 7098% | 67.8 GB | 215 MB |
+| xg | `vg convert -x --drop-haplotypes` | 9m 58s | 222% | 36.8 GB | 8.4 GB |
+| ri | `vg gbwt -Z -r` | 3m 28s | 6085% | 46.4 GB | 9.5 GB |
+| dist | `vg index -j` | 1h 00m | 96% | **262 GB** | **105.5 GB** |
+| hapl | `vg haplotypes -H` | 1h 53m | 1078% | 63.9 GB | 19.9 GB |
+| **Total** | | **~3h 40m** | — | — | **~148 GB** |
+
+> **Note:** `vg index -j` (dist) is the bottleneck — single-threaded, ~262 GB
+> peak memory, and ~105 GB output (71% of the total).
+
+Recommended: 32+ cores, 300 GB memory, 300 GB SSD (the 300 GB memory floor is
+driven by `vg index -j` dist, which peaks at ~262 GB RSS).
+
 ### 2. Build bwa-mem2 index
 
 `dcsmap`'s linear aligner (bwa-mem2) looks up its index files (`.0123`, `.amb`,
@@ -216,6 +237,21 @@ bwa-mem2 index <prefix>.ref.fasta
 
 This writes the index files next to the fasta. The `.fai` and `.dict` already
 exist from step 1.
+
+#### bwa-mem2 index resource consumption
+
+Measured on the same GRCh38 reference fasta (`hprc-v2.0-mc-grch38.ref.fasta`,
+3.0 GB, ref seq len 6,199,845,082):
+
+| Step | Wall time | CPU % | Peak RSS | Output size |
+|------|-----------|-------|----------|-------------|
+| `bwa-mem2 index` | 16m 51s | 99% | 69.3 GB | 16.9 GB |
+
+Output breakdown: `.bwt.2bit.64` (9.4 GB), `.0123` (5.8 GB), `.pac` (738 MB),
+`.amb` / `.ann` (< 30 KB).
+
+Recommended: 2+ cores, 128 GB memory, 50 GB SSD (the ~70 GB peak RSS of
+`bwa-mem2 index` dominates the memory requirement).
 
 ## License
 
