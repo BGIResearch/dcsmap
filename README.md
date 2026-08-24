@@ -148,8 +148,8 @@ below. See `data/hprc_graph_urls.tsv` for the full list.
 
 | Coordinate | Version | Size | URL |
 |------------|---------|------|-----|
-| GRCh38 | v2 | 5.4 GB | [hprc-v2.0-mc-grch38.gbz](https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/freeze/release2/minigraph-cactus/v2.0/hprc-v2.0-mc-grch38/hprc-v2.0-mc-grch38.gbz) |
-| CHM13 | v2 | 5.7 GB | [hprc-v2.0-mc-chm13.gbz](https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/freeze/release2/minigraph-cactus/v2.0/hprc-v2.0-mc-chm13/hprc-v2.0-mc-chm13.gbz) |
+| GRCh38 | v2 | 5.4 GB | https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/freeze/release2/minigraph-cactus/v2.0/hprc-v2.0-mc-grch38/hprc-v2.0-mc-grch38.gbz |
+| CHM13 | v2 | 5.7 GB | https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/freeze/release2/minigraph-cactus/v2.0/hprc-v2.0-mc-chm13/hprc-v2.0-mc-chm13.gbz |
 
 > **Note:** See `data/hprc_graph_urls.tsv` for additional versions (v1.1, v2-eval) and filtered (d46) graphs.
 
@@ -202,7 +202,7 @@ scripts/build_hapl_fasta.sh /data/hprc-v2.0-mc-chm13.gbz CHM13
 # (no ref_dict needed — CHM13 has only chr1-22/X/Y/M, natural order is used)
 ```
 
-#### build vg hapl index resource consumption
+**build vg hapl index resource consumption**
 
 Measured on the HPRC v2 GRCh38 Default graph (`hprc-v2.0-mc-grch38.gbz`,
 5.4 GB). 
@@ -236,7 +236,7 @@ bwa-mem2 index <prefix>.ref.fasta
 This writes the index files next to the fasta. The `.fai` and `.dict` already
 exist from step 1.
 
-#### bwa-mem2 index resource consumption
+**bwa-mem2 index resource consumption**
 
 Measured on the same GRCh38 reference fasta (`hprc-v2.0-mc-grch38.ref.fasta`,
 3.0 GB, ref seq len 6,199,845,082):

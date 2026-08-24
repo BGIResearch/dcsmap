@@ -129,8 +129,8 @@ gbz 图。完整列表见 `data/hprc_graph_urls.tsv`。
 
 | 坐标系 | 版本 | 大小 | URL |
 |--------|------|------|-----|
-| GRCh38 | v2 | 5.4 GB | [hprc-v2.0-mc-grch38.gbz](https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/freeze/release2/minigraph-cactus/v2.0/hprc-v2.0-mc-grch38/hprc-v2.0-mc-grch38.gbz) |
-| CHM13 | v2 | 5.7 GB | [hprc-v2.0-mc-chm13.gbz](https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/freeze/release2/minigraph-cactus/v2.0/hprc-v2.0-mc-chm13/hprc-v2.0-mc-chm13.gbz) |
+| GRCh38 | v2 | 5.4 GB | https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/freeze/release2/minigraph-cactus/v2.0/hprc-v2.0-mc-grch38/hprc-v2.0-mc-grch38.gbz |
+| CHM13 | v2 | 5.7 GB | https://s3-us-west-2.amazonaws.com/human-pangenomics/pangenomes/freeze/release2/minigraph-cactus/v2.0/hprc-v2.0-mc-chm13/hprc-v2.0-mc-chm13.gbz |
 
 > **注：** 其他版本（v1.1、v2-eval）及 filtered (d46) 图谱见 `data/hprc_graph_urls.tsv`。
 
@@ -180,7 +180,7 @@ scripts/build_hapl_fasta.sh /data/hprc-v2.0-mc-chm13.gbz CHM13
 # （无需 ref_dict —— CHM13 仅含 chr1-22/X/Y/M，使用自然顺序）
 ```
 
-#### 构建 vg hapl 索引资源消耗
+**构建 vg hapl 索引资源消耗**
 
 基于 HPRC v2 GRCh38 Default 图（`hprc-v2.0-mc-grch38.gbz`，5.4 GB）实测。
 
@@ -210,7 +210,7 @@ bwa-mem2 index <prefix>.ref.fasta
 
 这会将索引文件写入 fasta 旁。`.fai` 和 `.dict` 已在步骤 1 中生成。
 
-#### bwa-mem2 索引资源消耗
+**bwa-mem2 索引资源消耗**
 
 基于同一 GRCh38 参考 fasta（`hprc-v2.0-mc-grch38.ref.fasta`，3.0 GB，ref seq len 6,199,845,082）实测：
 
