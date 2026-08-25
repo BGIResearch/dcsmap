@@ -14,7 +14,7 @@ make -j
 
 The binary `dcsmap` is output to `build/`. It is **purely statically linked**
 (`-static`), so it has no runtime shared-library dependencies and can be copied
-to any Linux x86_64 machine.
+to any Linux machine of the same architecture.
 
 ### Example
 
@@ -239,7 +239,7 @@ exist from step 1.
 **bwa-mem2 index resource consumption**
 
 Measured on the same GRCh38 reference fasta (`hprc-v2.0-mc-grch38.ref.fasta`,
-3.0 GB, ref seq len 6,199,845,082):
+3.0 GB):
 
 | Step | Wall time | CPU % | Peak RSS | Output size |
 |------|-----------|-------|----------|-------------|

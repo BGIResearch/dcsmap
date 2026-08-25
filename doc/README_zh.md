@@ -10,7 +10,7 @@ cmake ..
 make -j
 ```
 
-二进制文件 `dcsmap` 输出到 `build/`。它采用**纯静态链接**（`-static`），因此没有运行时共享库依赖，可拷贝到任意 Linux x86_64 机器上运行。
+二进制文件 `dcsmap` 输出到 `build/`。它采用**纯静态链接**（`-static`），因此没有运行时共享库依赖，可拷贝到任意具有相同硬件架构的Linux机器上运行。
 
 ### 示例
 
@@ -212,7 +212,7 @@ bwa-mem2 index <prefix>.ref.fasta
 
 **bwa-mem2 索引资源消耗**
 
-基于同一 GRCh38 参考 fasta（`hprc-v2.0-mc-grch38.ref.fasta`，3.0 GB，ref seq len 6,199,845,082）实测：
+基于同一 GRCh38 参考 fasta（`hprc-v2.0-mc-grch38.ref.fasta`，3.0 GB）实测：
 
 | 步骤 | 墙钟时间 | CPU% | 峰值 RSS | 产出大小 |
 |------|---------|------|---------|---------|
