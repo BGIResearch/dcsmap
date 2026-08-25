@@ -216,7 +216,7 @@ struct Args {
     std::string gbz, hapl, graph_ref_contigs;
     std::string extract_model;
     std::string sample_name = "SAMPLE";
-    std::string platform = "Illumina";
+    std::string platform = "DNBSEQ";
     int threads = 32;
     std::string tools_root;
     std::string java_home;
@@ -230,7 +230,7 @@ struct Args {
 // Print one option line: "<opt><pad>desc" with the description column at 46.
 // Continuation lines in `desc` are indented to column 46.
 void printOpt(const std::string& opt, const std::vector<std::string>& desc) {
-    const size_t kCol = 46;
+    const size_t kCol = 40;
     std::string first = desc.empty() ? std::string() : desc[0];
     std::string line = opt;
     if (line.size() < kCol) line.append(kCol - line.size(), ' ');
@@ -259,10 +259,8 @@ void usage() {
     printOpt("  --graph-ref-contigs <file>",  {"vg ref-paths file"});
     printOpt("  --extract-model <file>",      {"model file for extract-bam"});
     std::cerr << "\nOptions:\n";
-    printOpt("  -h, --help",                  {"display help message"});
-    printOpt("  --version",                   {"display version message"});
     printOpt("  --sample-name <str>",         {"sample name (default: SAMPLE)"});
-    printOpt("  --platform <str>",            {"sequencing platform (default: Illumina)"});
+    printOpt("  --platform <str>",            {"sequencing platform (default: DNBSEQ)"});
     printOpt("  --threads <int>",             {"number of threads to use (default: 32)"});
     printOpt("  --mode <str>",                {"workflow mode (default: dcsmap)",
                                               "available options: {dcsmap, dcsmap-m1}"});
@@ -274,6 +272,8 @@ void usage() {
     printOpt("  --parallel <bool>",           {"run linear_align_extract and vg_haplotype in parallel (default: true)",
                                               "set to false to run vg_haplotype first, then linear_align_extract"});
     printOpt("  --clean <bool>",              {"clean work dir on success, keeping command.sh/logs/rc (default: true)"});
+    printOpt("  -h, --help",                  {"display help message"});
+    printOpt("  --version",                   {"display version message"});
 }
 
 bool parseBool(const std::string& v, bool& out, std::string& err, const char* key) {
