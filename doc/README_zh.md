@@ -51,36 +51,36 @@ export PATH="${DCSTOOLS_HOME}/libexec:${PATH}"
 
 ```
 Program: dcsmap
-version: 1.0.0
+version: 1.0.1
 
 Usage: dcsmap [-option]
 
 Required:
-  --fq1 <file>                     输入 read1 fastq 路径
-  --fq2 <file>                     输入 read2 fastq 路径
-  --out-bam <file>                 输出 bam 路径（工作目录默认为其所在目录）
-  --ref-fasta <file>               参考 fasta 路径（需含 .fai + .dict + 比对器索引）
-  --gbz <file>                     vg gbz 图路径
-  --hapl <file>                    vg hapl 索引路径
-  --graph-ref-contigs <file>       vg ref-paths 文件
-  --extract-model <file>           extract-bam 模型文件
+  --fq1 <file>                          输入 read1 fastq 路径
+  --fq2 <file>                          输入 read2 fastq 路径
+  --out-bam <file>                      输出 bam 路径（工作目录默认为其所在目录）
+  --ref-fasta <file>                    参考 fasta 路径（需含 .fai + .dict + 比对器索引）
+  --gbz <file>                          vg gbz 图路径
+  --hapl <file>                         vg hapl 索引路径
+  --graph-ref-contigs <file>            vg ref-paths 文件
+  --extract-model <file>                extract-bam 模型文件
 
 Options:
-  -h, --help                       显示帮助信息
-  --version                        显示版本信息
-  --sample-name <str>              样本名（默认：SAMPLE）
-  --platform <str>                 测序平台（默认：Illumina）
-  --threads <int>                  使用的线程数（默认：32）
-  --mode <str>                     工作流模式（默认：dcsmap）
-                                   可选值：{dcsmap, dcsmap-m1}
-  --tools-root <dir>               工具根目录（libexec + jar）
-                                   默认：DCSTOOLS_HOME 环境变量或可执行文件父目录
-  --java-home <dir>                JAVA home（须为 Java 8）
-                                   默认：JAVA_HOME 环境变量
-  --work-dir <dir>                 工作目录（默认：out-bam-dir/work.XXXXXX）
-  --parallel <bool>                linear_align_extract 与 vg_haplotype 并行运行（默认：true）
-                                   设为 false 时先运行 vg_haplotype，再运行 linear_align_extract
-  --clean <bool>                   成功后清理工作目录，保留 command.sh/logs/rc（默认：true）
+  --sample-name <str>                   样本名（默认：SAMPLE）
+  --platform <str>                      测序平台（默认：DNBSEQ）
+  --threads <int>                       使用的线程数（默认：32）
+  --mode <str>                          工作流模式（默认：dcsmap）
+                                        可选值：{dcsmap, dcsmap-m1}
+  --tools-root <dir>                    工具根目录（libexec + jar）
+                                        默认：DCSTOOLS_HOME 环境变量或可执行文件父目录
+  --java-home <dir>                     JAVA home（须为 Java 8）
+                                        默认：JAVA_HOME 环境变量
+  --work-dir <dir>                      工作目录（默认：out-bam-dir/work.XXXXXX）
+  --parallel <bool>                     linear_align_extract 与 vg_haplotype 并行运行（默认：true）
+                                        设为 false 时先运行 vg_haplotype，再运行 linear_align_extract
+  --clean <bool>                        成功后清理工作目录，保留 command.sh/logs/rc（默认：true）
+  -h, --help                            显示帮助信息
+  --version                             显示版本信息
 ```
 
 ## 工作流

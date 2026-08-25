@@ -69,36 +69,36 @@ export PATH="${DCSTOOLS_HOME}/libexec:${PATH}"
 
 ```
 Program: dcsmap
-version: 1.0.0
+version: 1.0.1
 
 Usage: dcsmap [-option]
 
 Required:
-  --fq1 <file>                     input read1 fastq path
-  --fq2 <file>                     input read2 fastq path
-  --out-bam <file>                 output bam path (work dir defaults to its dirname)
-  --ref-fasta <file>               reference fasta path (with .fai + .dict + aligner index)
-  --gbz <file>                     vg gbz graph path
-  --hapl <file>                    vg hapl index path
-  --graph-ref-contigs <file>       vg ref-paths file
-  --extract-model <file>           model file for extract-bam
+  --fq1 <file>                          input read1 fastq path
+  --fq2 <file>                          input read2 fastq path
+  --out-bam <file>                      output bam path (work dir defaults to its dirname)
+  --ref-fasta <file>                    reference fasta path (with .fai + .dict + aligner index)
+  --gbz <file>                          vg gbz graph path
+  --hapl <file>                         vg hapl index path
+  --graph-ref-contigs <file>            vg ref-paths file
+  --extract-model <file>                model file for extract-bam
 
 Options:
-  -h, --help                       display help message
-  --version                        display version message
-  --sample-name <str>              sample name (default: SAMPLE)
-  --platform <str>                 sequencing platform (default: Illumina)
-  --threads <int>                  number of threads to use (default: 32)
-  --mode <str>                     workflow mode (default: dcsmap)
-                                   available options: {dcsmap, dcsmap-m1}
-  --tools-root <dir>               tools root dir (libexec + jar)
-                                   default: DCSTOOLS_HOME env or parent-of-exe-dir
-  --java-home <dir>                JAVA home (must be Java 8)
-                                   default: JAVA_HOME env
-  --work-dir <dir>                 work dir (default: out-bam-dir/work.XXXXXX)
-  --parallel <bool>                run linear_align_extract and vg_haplotype in parallel (default: true)
-                                   set to false to run vg_haplotype first, then linear_align_extract
-  --clean <bool>                   clean work dir on success, keeping command.sh/logs/rc (default: true)
+  --sample-name <str>                   sample name (default: SAMPLE)
+  --platform <str>                      sequencing platform (default: DNBSEQ)
+  --threads <int>                       number of threads to use (default: 32)
+  --mode <str>                          workflow mode (default: dcsmap)
+                                        available options: {dcsmap, dcsmap-m1}
+  --tools-root <dir>                    tools root dir (libexec + jar)
+                                        default: DCSTOOLS_HOME env or parent-of-exe-dir
+  --java-home <dir>                     JAVA home (must be Java 8)
+                                        default: JAVA_HOME env
+  --work-dir <dir>                      work dir (default: out-bam-dir/work.XXXXXX)
+  --parallel <bool>                     run linear_align_extract and vg_haplotype in parallel (default: true)
+                                        set to false to run vg_haplotype first, then linear_align_extract
+  --clean <bool>                        clean work dir on success, keeping command.sh/logs/rc (default: true)
+  -h, --help                            display help message
+  --version                             display version message
 ```
 
 ## Workflow
