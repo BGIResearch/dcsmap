@@ -120,7 +120,27 @@ void Task::run() {
         "    echo \"[ERROR] neither mawk nor awk found in PATH\" >&2\n"
         "    exit 1\n"
         "fi\n"
-        "export AWK\n";
+        "export AWK\n"
+        "# resolve a GNU-compatible timer: it must exist *and* accept -f, since\n"
+        "# /usr/bin/time may be absent (slim images) or a BSD/busybox variant\n"
+        "TIME_CMD=\"\"\n"
+        "for _t in /usr/bin/time \"$(command -v gtime || true)\" \"$(command -v time || true)\"; do\n"
+        "    [ -n \"${_t}\" ] && [ -x \"${_t}\" ] || continue\n"
+        "    if \"${_t}\" -f \"%e\" true >/dev/null 2>&1; then TIME_CMD=\"${_t}\"; break; fi\n"
+        "done\n"
+        "unset _t\n"
+        "if [ -z \"${TIME_CMD}\" ]; then\n"
+        "    echo \"[WARN] no GNU-compatible 'time' found; running without resource timing\" >&2\n"
+        "fi\n"
+        "# run a command under the timer, or unmeasured when no timer is available\n"
+        "timed() {\n"
+        "    local _label=\"$1\"; shift\n"
+        "    if [ -n \"${TIME_CMD}\" ]; then\n"
+        "        \"${TIME_CMD}\" -f \"[${_label}] real %e\\tuser %U\\tsys %S\\tcpu_percentage %P\\tmaxrss %M\" \"$@\"\n"
+        "    else\n"
+        "        \"$@\"\n"
+        "    fi\n"
+        "}\n";
     std::string full_script;
     if (script_.rfind(marker, 0) == 0) {
         full_script = preamble + script_.substr(marker.size());

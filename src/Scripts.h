@@ -71,7 +71,7 @@ std::string buildMergeBams(const Config& c,
 
 // REALIGN: GATK RealignerTargetCreator + abra2 (always --gkl).
 // `out_subdir` is the relative subdir under the job dir where abra2 writes
-// (e.g. "giraffe" for dcsmap intermediate, "merged_realign" for dcsmap-m1 final).
+// (e.g. "abra2").
 // `final_out_bam` is empty for the intermediate case; when non-empty the abra2
 // bam is written directly to that absolute path (and out_subdir is ignored for
 // placement).

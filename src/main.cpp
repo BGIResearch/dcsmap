@@ -19,7 +19,10 @@
 #ifndef DCSMAP_VERSION
 #define DCSMAP_VERSION "unknown"
 #endif
-static const char* kVersion = DCSMAP_VERSION;
+#ifndef DCSMAP_GIT_COMMIT
+#define DCSMAP_GIT_COMMIT "unknown"
+#endif
+static const char* kVersion = DCSMAP_VERSION "-" DCSMAP_GIT_COMMIT;
 
 namespace {
 
@@ -419,7 +422,7 @@ int orchestrate(Config& c, const Args& a) {
         // realign (intermediate) on giraffe bam -> abra2 bam in job dir
         std::vector<std::string> ra_out;
         Task ra("realign", c.work_root,
-                buildRealign(c, giraffe_bam, giraffe_bai, "giraffe", "", ra_out), ra_out);
+                buildRealign(c, giraffe_bam, giraffe_bai, "abra2", "", ra_out), ra_out);
         if (!runSync(ra)) return 1;
         std::string abra2_bam = ra_out[0];
         std::string abra2_bai = ra_out[1];
@@ -441,7 +444,7 @@ int orchestrate(Config& c, const Args& a) {
         // realign (FINAL) on merged bam -> out-bam
         std::vector<std::string> ra_out;
         Task ra("realign", c.work_root,
-                buildRealign(c, merged_bam, merged_bai, "merged_realign", final_bam, ra_out), ra_out);
+                buildRealign(c, merged_bam, merged_bai, "abra2", final_bam, ra_out), ra_out);
         if (!runSync(ra)) return 1;
     }
 

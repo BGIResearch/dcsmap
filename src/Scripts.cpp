@@ -43,7 +43,7 @@ extract_prefix="${sample}.linear.extract"
 out_bam="${sample}.linear.not-extract.bam"
 
 echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') Start linear align (bwa-mem2) mapping and extract ..."
-/usr/bin/time -f "[linear-align/bwa-mem2] real %e\tuser %U\tsys %S\tcpu_percentage %P\tmaxrss %M" \
+timed "linear-align/bwa-mem2" \
     bwa-mem2 mem -S -r 3 -y 0 -Y -t {{THREADS}} -R "$read_group" "$in_ref" "{{FQ1}}" "{{FQ2}}" | \
     "${AWK}" '/^@/ {print;next} {print $0"\tMX:Z:BWA-MEM2"}' | \
     extract-bam -b 4000000 -t 12 -p "$extract_prefix" -M "{{EXTRACT_MODEL}}" | \
@@ -90,7 +90,7 @@ echo "${input_fq1}" > "${kmc_outdir}/kmc_input_list.txt"
 echo "${input_fq2}" >> "${kmc_outdir}/kmc_input_list.txt"
 
 echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') Start kmer counting ..."
-/usr/bin/time -f "[kmc] real %e\tuser %U\tsys %S\tcpu_percentage %P\tmaxrss %M" \
+timed "kmc" \
     kmc -k${kmer_len} -t${threads} -m${kmc_max_ram} -okff @"${kmc_outdir}/kmc_input_list.txt" "${kmc_outdir}/${kmc_output_prefix}" "${kmc_outdir}/kmc_tmp"
 rm -rf "${kmc_outdir}/kmc_tmp" "${kmc_outdir}/kmc_input_list.txt"
 echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') End kmer counting."
@@ -105,7 +105,7 @@ mkdir -p "${haplotype_sampling_outdir}"
 unset OMP_NUM_THREADS
 
 echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') Start haplotype sampling ..."
-/usr/bin/time -f "[vg-haplotypes] real %e\tuser %U\tsys %S\tcpu_percentage %P\tmaxrss %M" \
+timed "vg-haplotypes" \
     vg haplotypes -v 2 -t ${threads} \
         --num-haplotypes ${haplotype_number} \
         --present-discount ${present_discount} \
@@ -120,11 +120,11 @@ echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') Start haplotype sampling ..."
 echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') End haplotype sampling."
 
 echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') Start creating indexes ..."
-/usr/bin/time -f "[vg-index] real %e\tuser %U\tsys %S\tcpu_percentage %P\tmaxrss %M" \
+timed "vg-index" \
     vg index -t ${threads} -j ${haplotype_sampling_outdir}/haplotype_sampling.dist ${haplotype_sampling_outdir}/haplotype_sampling.gbz
 in_minimizer_k=29
 in_minimizer_w=11
-/usr/bin/time -f "[vg-minimizer] real %e\tuser %U\tsys %S\tcpu_percentage %P\tmaxrss %M" \
+timed "vg-minimizer" \
     vg minimizer -p -t ${threads} -k ${in_minimizer_k} -w ${in_minimizer_w} --weighted --save-memory \
         -o ${haplotype_sampling_outdir}/haplotype_sampling.min -z ${haplotype_sampling_outdir}/haplotype_sampling.zipcodes \
         -d ${haplotype_sampling_outdir}/haplotype_sampling.dist ${haplotype_sampling_outdir}/haplotype_sampling.gbz
@@ -174,7 +174,7 @@ in_preset="default"
 output_surject_bam="${giraffe_outdir}/${in_sample_name}.project_to_linear.bam"
 
 echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') Start vg giraffe mapping ..."
-/usr/bin/time -f "[vg-giraffe] real %e\tuser %U\tsys %S\tcpu_percentage %P\tmaxrss %M" \
+timed "vg-giraffe" \
     vg giraffe \
         --progress \
         --read-group "${read_group}" \
@@ -228,7 +228,7 @@ out_bam="{{OUT_BAM}}"
 out_bai="${out_bam}.bai"
 
 echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') Start merge bams ..."
-/usr/bin/time -f "[samtools-merge] real %e\tuser %U\tsys %S\tcpu_percentage %P\tmaxrss %M" \
+timed "samtools-merge" \
     samtools merge \
         -f -p -c -@ {{THREADS}} --write-index -OBAM \
         -o "${out_bam}"##idx##"${out_bai}" \
@@ -300,7 +300,7 @@ threads={{THREADS}}
 realign_targets_bed="{{TARGETS_BED}}"
 
 echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') Start prepare realign targets ..."
-/usr/bin/time -f "[gatk-RealignerTargetCreator] real %e\tuser %U\tsys %S\tcpu_percentage %P\tmaxrss %M" \
+timed "gatk-RealignerTargetCreator" \
     java -Xms24g -Xmx64g -XX:+UseG1GC -jar ${gatk_jar} \
         -T RealignerTargetCreator \
         -drf DuplicateRead \
@@ -314,7 +314,7 @@ echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') End prepare realign targets."
 
 realigned_bam="{{REALIGNED_BAM}}"
 echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') Start abra2 indel realignment ..."
-/usr/bin/time -f "[abra2] real %e\tuser %U\tsys %S\tcpu_percentage %P\tmaxrss %M" \
+timed "abra2" \
     java -Xms24g -Xmx80g -XX:+UseG1GC -jar ${abra2_jar} \
         --targets ${realign_targets_bed} \
         --in ${input_bam} \
