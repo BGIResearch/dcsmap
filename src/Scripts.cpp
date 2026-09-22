@@ -258,21 +258,24 @@ std::string buildRealign(const Config& c,
     std::string targets_bed;
     std::string intervals_file;
 
+    // Targets/intervals always live in <jobdir>/<out_subdir>; only the bam may be
+    // redirected to the caller-provided output path.
+    const std::string work_subdir = joinPath(jd, out_subdir);
+    targets_bed = joinPath(work_subdir, c.sample_name + ".realign_targets.bed");
+    intervals_file = joinPath(work_subdir, c.sample_name + ".forIndelRealigner.intervals");
+
     if (!final_out_bam.empty()) {
         // final task: write abra2 bam directly to outdir path
         realigned_bam = final_out_bam;
         std::string parent = realigned_bam;
         size_t slash = parent.find_last_of('/');
         parent = (slash == std::string::npos) ? "." : parent.substr(0, slash);
-        mkdir_block = "realign_outdir=\"" + parent + "\"\nmkdir -p \"${realign_outdir}\"";
-        targets_bed = joinPath(parent, c.sample_name + ".realign_targets.bed");
-        intervals_file = joinPath(parent, c.sample_name + ".forIndelRealigner.intervals");
+        mkdir_block = "realign_outdir=\"" + parent + "\"\nmkdir -p \"${realign_outdir}\" \"" +
+                      work_subdir + "\"";
     } else {
         // intermediate: <jobdir>/<out_subdir>/<sample>.abra2.bam
-        realigned_bam = joinPath(joinPath(jd, out_subdir), c.sample_name + ".abra2.bam");
+        realigned_bam = joinPath(work_subdir, c.sample_name + ".abra2.bam");
         mkdir_block = "realign_outdir=\"" + out_subdir + "\"\nmkdir -p \"${realign_outdir}\"";
-        targets_bed = joinPath(joinPath(jd, out_subdir), c.sample_name + ".realign_targets.bed");
-        intervals_file = joinPath(joinPath(jd, out_subdir), c.sample_name + ".forIndelRealigner.intervals");
     }
     outputs = { realigned_bam, realigned_bam + ".bai" };
 
