@@ -37,19 +37,19 @@ dcsmap \
 and `jar/` subdirectories) and requires Java 8 for ABRA2.
 
 - `--tools-root`: defaults to the parent of the `dcsmap` executable's directory
-  (e.g. if `dcsmap` is at `<DCSTOOLS_HOME>/libexec/dcsmap`, the default is
-  `<DCSTOOLS_HOME>`). If `dcsmap` is placed elsewhere, set `DCSTOOLS_HOME` env
+  (e.g. if `dcsmap` is at `<DCS_HOME>/libexec/dcsmap`, the default is
+  `<DCS_HOME>`). If `dcsmap` is placed elsewhere, set `DCS_HOME` env
   var or pass `--tools-root` explicitly. `--tools-root` takes precedence over
-  `DCSTOOLS_HOME`.
+  `DCS_HOME`.
 - `--java-home`: defaults to the `JAVA_HOME` env var. Must point to a Java 8
   installation (required by ABRA2). Pass `--java-home` explicitly to override on
   a per-invocation basis.
 
 ```bash
 # Optional: override via env vars instead of CLI flags
-export DCSTOOLS_HOME=/path/to/dcstools
+export DCS_HOME=/path/to/dcstools
 export JAVA_HOME=/path/to/jdk8
-export PATH="${DCSTOOLS_HOME}/libexec:${PATH}"
+export PATH="${DCS_HOME}/libexec:${PATH}"
 ```
 
 **Graph and linear reference inputs**
@@ -63,7 +63,7 @@ export PATH="${DCSTOOLS_HOME}/libexec:${PATH}"
   with `bwa-mem2 index` (see [Index preparation](#index-preparation), step 2).
 - `--extract-model`: the machine-learning model used by `extract-bam` to flag
   low-confidence linear alignments for graph realignment. Obtain it from the
-  DCSTools distribution (`$DCSTOOLS_HOME/share/dcsmap/extract.model` or similar).
+  DCSTools distribution (`$DCS_HOME/share/dcsmap/extract.model` or similar).
 
 ## Usage
 
@@ -90,7 +90,7 @@ Options:
   --mode <str>                          workflow mode (default: dcsmap)
                                         available options: {dcsmap, dcsmap-m1}
   --tools-root <dir>                    tools root dir (libexec + jar)
-                                        default: DCSTOOLS_HOME env or parent-of-exe-dir
+                                        default: DCS_HOME env or parent-of-exe-dir
   --java-home <dir>                     JAVA home (must be Java 8)
                                         default: JAVA_HOME env
   --work-dir <dir>                      work dir (default: out-bam-dir/work.XXXXXX)
@@ -161,8 +161,8 @@ pathnames) and the bwa-mem2 linear-side index. Prepare them in two steps:
 ### 1. Build vg graph indices (scripts/build_hapl_fasta.sh)
 
 Generates the vg hapl index, reference fasta (+ .fai / .dict), and the ref
-pathnames file from a vg gbz graph. Reads `DCSTOOLS_HOME` from the environment
-and expects `vg`, `samtools` under `$DCSTOOLS_HOME/libexec`.
+pathnames file from a vg gbz graph. Reads `DCS_HOME` from the environment
+and expects `vg`, `samtools` under `$DCS_HOME/libexec`.
 
 ```
 Usage: build_hapl_fasta.sh <gbz> <ref_path> [ref_dict] [out_prefix]
@@ -188,7 +188,7 @@ the fasta + pathnames generation only).
 
 1) GRCh38 linear reference coordinate system
 ```bash
-export DCSTOOLS_HOME=/path/to/dcstools
+export DCS_HOME=/path/to/dcstools
 scripts/build_hapl_fasta.sh /data/hprc-v2.0-mc-grch38.gbz GRCh38 \
     data/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.dict
 # Outputs written to /data/hprc-v2.0-mc-grch38.* (next to the input gbz)
@@ -196,7 +196,7 @@ scripts/build_hapl_fasta.sh /data/hprc-v2.0-mc-grch38.gbz GRCh38 \
 
 2) CHM13 T2T linear reference coordinate system
 ```bash
-export DCSTOOLS_HOME=/path/to/dcstools
+export DCS_HOME=/path/to/dcstools
 scripts/build_hapl_fasta.sh /data/hprc-v2.0-mc-chm13.gbz CHM13
 # Outputs written to /data/hprc-v2.0-mc-chm13.* (next to the input gbz)
 # (no ref_dict needed — CHM13 has only chr1-22/X/Y/M, natural order is used)

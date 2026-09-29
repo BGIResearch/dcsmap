@@ -268,7 +268,7 @@ void usage() {
     printOpt("  --mode <str>",                {"workflow mode (default: dcsmap)",
                                               "available options: {dcsmap, dcsmap-m1}"});
     printOpt("  --tools-root <dir>",          {"tools root dir (libexec + jar)",
-                                              "default: DCSTOOLS_HOME env or parent-of-exe-dir"});
+                                              "default: DCS_HOME env or parent-of-exe-dir"});
     printOpt("  --java-home <dir>",           {"JAVA home (must be Java 8)",
                                               "default: JAVA_HOME env"});
     printOpt("  --work-dir <dir>",            {"work dir (default: out-bam-dir/work.XXXXXX)"});
@@ -323,7 +323,7 @@ bool parseArgs(int argc, char** argv, Args& a, std::string& err) {
 
 std::string resolveToolsRoot(const Args& a) {
     if (!a.tools_root.empty()) return absolute(a.tools_root);
-    const char* env = std::getenv("DCSTOOLS_HOME");
+    const char* env = std::getenv("DCS_HOME");
     if (env && env[0]) return absolute(env);
     char exe[PATH_MAX];
     ssize_t n = readlink("/proc/self/exe", exe, sizeof(exe) - 1);

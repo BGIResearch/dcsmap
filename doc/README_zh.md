@@ -30,14 +30,14 @@ dcsmap \
 
 `dcsmap` 依赖 DCSTools 环境：它从包含 `libexec/` 和 `jar/` 子目录的工具根目录中调用 `vg`、`samtools`、`bwa-mem2`、`abra2.jar` 等工具，并需要 Java 8 运行 ABRA2。
 
-- `--tools-root`：默认取 `dcsmap` 可执行文件所在目录的父目录（例如 `dcsmap` 位于 `<DCSTOOLS_HOME>/libexec/dcsmap` 时，默认值为 `<DCSTOOLS_HOME>`）。若将 `dcsmap` 放在其他位置，请设置 `DCSTOOLS_HOME` 环境变量或显式传入 `--tools-root`。`--tools-root` 的优先级高于 `DCSTOOLS_HOME`。
+- `--tools-root`：默认取 `dcsmap` 可执行文件所在目录的父目录（例如 `dcsmap` 位于 `<DCS_HOME>/libexec/dcsmap` 时，默认值为 `<DCS_HOME>`）。若将 `dcsmap` 放在其他位置，请设置 `DCS_HOME` 环境变量或显式传入 `--tools-root`。`--tools-root` 的优先级高于 `DCS_HOME`。
 - `--java-home`：默认读取 `JAVA_HOME` 环境变量，且必须指向 Java 8 安装目录（ABRA2 需要）。可显式传入 `--java-home` 按次覆盖。
 
 ```bash
 # 可选：使用环境变量代替命令行参数
-export DCSTOOLS_HOME=/path/to/dcstools
+export DCS_HOME=/path/to/dcstools
 export JAVA_HOME=/path/to/jdk8
-export PATH="${DCSTOOLS_HOME}/libexec:${PATH}"
+export PATH="${DCS_HOME}/libexec:${PATH}"
 ```
 
 **图和线性参考输入**
@@ -45,7 +45,7 @@ export PATH="${DCSTOOLS_HOME}/libexec:${PATH}"
 - `--gbz`：从 [HPRC 图谱](#hprc-图谱)下载 HPRC minigraph-cactus gbz 图。
 - `--hapl`、`--graph-ref-contigs`（`<prefix>.ref.pathnames`）以及 `--ref-fasta`（`<prefix>.ref.fasta` + `.fai` + `.dict`）：三者均由 `scripts/build_hapl_fasta.sh` 从 gbz 一并生成（见[索引构建](#索引构建)步骤 1）。
 - `linear_align_extract` 使用的 bwa-mem2 索引文件（`.0123`、`.amb`、`.ann`、`.bwt.2bit.64`、`.pac`）在 `--ref-fasta` 旁查找；使用 `bwa-mem2 index` 构建（见[索引构建](#索引构建)步骤 2）。
-- `--extract-model`：`extract-bam` 用于标记低置信度线性比对以进行图重比对的机器学习模型。从 DCSTools 发行版获取（`$DCSTOOLS_HOME/share/dcsmap/extract.model` 或类似路径）。
+- `--extract-model`：`extract-bam` 用于标记低置信度线性比对以进行图重比对的机器学习模型。从 DCSTools 发行版获取（`$DCS_HOME/share/dcsmap/extract.model` 或类似路径）。
 
 ## 用法
 
@@ -72,7 +72,7 @@ Options:
   --mode <str>                          工作流模式（默认：dcsmap）
                                         可选值：{dcsmap, dcsmap-m1}
   --tools-root <dir>                    工具根目录（libexec + jar）
-                                        默认：DCSTOOLS_HOME 环境变量或可执行文件父目录
+                                        默认：DCS_HOME 环境变量或可执行文件父目录
   --java-home <dir>                     JAVA home（须为 Java 8）
                                         默认：JAVA_HOME 环境变量
   --work-dir <dir>                      工作目录（默认：out-bam-dir/work.XXXXXX）
@@ -140,7 +140,7 @@ dcsmap 需要两套索引：vg 图侧索引（hapl、ref fasta、pathnames）和
 
 ### 1. 构建 vg 图索引（scripts/build_hapl_fasta.sh）
 
-从 vg gbz 图生成 vg hapl 索引、参考 fasta（+ .fai / .dict）和 ref pathnames 文件。从环境变量读取 `DCSTOOLS_HOME`，并期望 `vg`、`samtools` 位于 `$DCSTOOLS_HOME/libexec`。
+从 vg gbz 图生成 vg hapl 索引、参考 fasta（+ .fai / .dict）和 ref pathnames 文件。从环境变量读取 `DCS_HOME`，并期望 `vg`、`samtools` 位于 `$DCS_HOME/libexec`。
 
 ```
 用法: build_hapl_fasta.sh <gbz> <ref_path> [ref_dict] [out_prefix]
@@ -166,7 +166,7 @@ fasta + pathnames 生成）。
 
 1) GRCh38 线性参考坐标系
 ```bash
-export DCSTOOLS_HOME=/path/to/dcstools
+export DCS_HOME=/path/to/dcstools
 scripts/build_hapl_fasta.sh /data/hprc-v2.0-mc-grch38.gbz GRCh38 \
     data/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.dict
 # 输出写入 /data/hprc-v2.0-mc-grch38.*（与输入 gbz 同级）
@@ -174,7 +174,7 @@ scripts/build_hapl_fasta.sh /data/hprc-v2.0-mc-grch38.gbz GRCh38 \
 
 2) CHM13 T2T 线性参考坐标系
 ```bash
-export DCSTOOLS_HOME=/path/to/dcstools
+export DCS_HOME=/path/to/dcstools
 scripts/build_hapl_fasta.sh /data/hprc-v2.0-mc-chm13.gbz CHM13
 # 输出写入 /data/hprc-v2.0-mc-chm13.*（与输入 gbz 同级）
 # （无需 ref_dict —— CHM13 仅含 chr1-22/X/Y/M，使用自然顺序）

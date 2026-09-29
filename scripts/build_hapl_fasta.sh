@@ -25,9 +25,9 @@
 #   <prefix>.hapl  (+ .snarls / .xg / .ri / .dist)
 set -euo pipefail
 
-: "${DCSTOOLS_HOME:=/path/to/dcstools}"
-export DCSTOOLS_HOME
-export PATH="${DCSTOOLS_HOME}/libexec:${PATH}"
+: "${DCS_HOME:=/path/to/dcstools}"
+export DCS_HOME
+export PATH="${DCS_HOME}/libexec:${PATH}"
 
 if [ $# -lt 2 ]; then
     echo "Usage: $0 <gbz> <ref_path> [ref_dict] [out_prefix]" >&2
